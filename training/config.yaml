@@ -1,0 +1,102 @@
+# AI Power Electronics Diagnostics — Training Configuration
+# All experiments reference this file. Override via CLI: --config my_config.yaml
+
+# ─────────────────────────────────────────────
+# Dataset
+# ─────────────────────────────────────────────
+dataset:
+  source: synthetic           # 'synthetic' | 'motor_temp' | 'both'
+  fault_domain: inverter      # 'inverter' | 'motor' | 'both'
+  n_per_class: 300            # Samples per class (synthetic)
+  window_size: 1024           # Samples per input window
+  n_channels: 6               # Signal channels (6 for inverter, 3 for motor)
+  hop_size: 512               # Sliding window hop (for real datasets)
+  normalize: true             # Z-score normalize per channel
+  train_frac: 0.70
+  val_frac: 0.15
+  # test_frac = 1 - train_frac - val_frac = 0.15
+
+# ─────────────────────────────────────────────
+# Model
+# ─────────────────────────────────────────────
+model:
+  name: cnn_waveform          # 'cnn_waveform' | 'spectrogram_cnn' | 'transformer' | 'bilstm' | 'autoencoder'
+  n_classes: 9                # Number of fault classes
+  dropout: 0.3
+
+  # CNN 1D specific
+  cnn_waveform:
+    base_filters: 64
+    kernel_size: 7
+
+  # Spectrogram CNN specific
+  spectrogram_cnn:
+    spectrogram_size: [128, 128]
+    log_scale: true
+
+  # Transformer specific
+  transformer:
+    patch_size: 64
+    d_model: 128
+    n_heads: 8
+    n_layers: 4
+    ffn_dim: 512
+
+  # BiLSTM specific
+  bilstm:
+    hidden_size: 256
+    n_layers: 2
+
+  # Autoencoder specific
+  autoencoder:
+    latent_channels: 32
+    base_filters: 64
+    anomaly_percentile: 95.0  # Threshold percentile on healthy val set
+
+# ─────────────────────────────────────────────
+# Training
+# ─────────────────────────────────────────────
+training:
+  epochs: 100
+  batch_size: 64
+  num_workers: 4
+  device: auto                # 'auto' | 'cpu' | 'cuda' | 'cuda:0'
+  mixed_precision: false      # Enable torch.cuda.amp
+
+  # Optimizer
+  optimizer: adamw            # 'adam' | 'adamw' | 'sgd'
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+
+  # Scheduler
+  scheduler: cosine           # 'cosine' | 'step' | 'plateau' | 'none'
+  cosine:
+    T_max: 100
+    eta_min: 1.0e-6
+  step:
+    step_size: 30
+    gamma: 0.1
+  plateau:
+    patience: 10
+    factor: 0.5
+
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 20
+    monitor: val_loss
+    min_delta: 1.0e-4
+
+  # Class imbalance handling
+  class_weights: balanced     # 'balanced' | 'none'
+
+# ─────────────────────────────────────────────
+# Checkpointing & Logging
+# ─────────────────────────────────────────────
+output:
+  checkpoint_dir: training/checkpoints
+  log_dir: logs
+  save_best: true
+  save_last: true
+  tensorboard: true
+  experiment_name: ""         # Auto-generated if empty: {model}_{dataset}_{timestamp}

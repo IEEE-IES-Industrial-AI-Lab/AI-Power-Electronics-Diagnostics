@@ -1,0 +1,40 @@
+# Benchmark configuration
+# Runs all models on synthetic inverter + motor datasets and records results
+
+benchmark:
+  n_per_class: 300          # Samples per class for each dataset
+  window_size: 1024
+  epochs: 80                # Training epochs per model
+  batch_size: 64
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: cosine
+  num_workers: 4
+  device: auto
+  random_seed: 42
+  n_runs: 3                 # Number of independent runs (for mean ± std)
+
+models:
+  - cnn_waveform
+  - spectrogram_cnn
+  - transformer
+  - bilstm
+  # autoencoder runs separately (unsupervised, different metrics)
+
+datasets:
+  - name: inverter_synthetic
+    fault_domain: inverter
+    source: synthetic
+    n_channels: 6
+    n_classes: 9
+
+  - name: motor_synthetic
+    fault_domain: motor
+    source: synthetic
+    n_channels: 3
+    n_classes: 5
+
+output:
+  results_dir: benchmarks/results
+  csv_file: benchmark_results.csv
+  save_checkpoints: false   # Don't save model weights during benchmark
