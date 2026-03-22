@@ -1,0 +1,9 @@
+dataset,model,n_runs,n_params,accuracy_mean,accuracy_std,macro_f1_mean,macro_f1_std,weighted_f1_mean,weighted_f1_std,cohen_kappa_mean,cohen_kappa_std,total_train_time_s_mean,total_train_time_s_std,avg_epoch_time_s_mean,avg_epoch_time_s_std
+inverter_synthetic,cnn_waveform,1,3987209,0.7353,0.0,0.6867,0.0,0.6998,0.0,0.7012,0.0,137.95,0.0,27.59,0.0
+inverter_synthetic,spectrogram_cnn,1,11190537,0.3676,0.0,0.3145,0.0,0.3114,0.0,0.2906,0.0,206.91,0.0,41.382,0.0
+inverter_synthetic,transformer,1,802953,0.3235,0.0,0.2507,0.0,0.2493,0.0,0.2411,0.0,147.12,0.0,29.423,0.0
+inverter_synthetic,bilstm,1,2185994,0.7794,0.0,0.7772,0.0,0.783,0.0,0.7517,0.0,1704.25,0.0,340.851,0.0
+motor_synthetic,cnn_waveform,1,3983301,0.4474,0.0,0.4091,0.0,0.3896,0.0,0.3055,0.0,55.64,0.0,11.129,0.0
+motor_synthetic,spectrogram_cnn,1,11179077,0.5,0.0,0.417,0.0,0.4202,0.0,0.3705,0.0,75.76,0.0,15.152,0.0
+motor_synthetic,transformer,1,802437,0.2105,0.0,0.0696,0.0,0.0732,0.0,0.0,0.0,40.23,0.0,8.046,0.0
+motor_synthetic,bilstm,1,2179334,0.6316,0.0,0.5937,0.0,0.5825,0.0,0.5398,0.0,531.61,0.0,106.321,0.0

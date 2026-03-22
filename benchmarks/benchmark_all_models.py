@@ -96,6 +96,29 @@ def build_model(model_name: str, n_channels: int, n_classes: int, window_size: i
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# STFT preprocessing for spectrogram_cnn
+# ─────────────────────────────────────────────────────────────────────────────
+
+def apply_stft_transform(X: np.ndarray) -> np.ndarray:
+    """
+    Convert raw waveform windows to STFT spectrograms.
+
+    Parameters
+    ----------
+    X : np.ndarray, shape (N, C, T)
+        Raw signal windows — N samples, C channels, T time steps.
+
+    Returns
+    -------
+    np.ndarray, shape (N, C, 128, 128)
+        Log-magnitude STFT spectrograms, one per channel, resized to 128×128.
+    """
+    from signal_processing.stft_spectrogram import STFTSpectrogram
+    stft = STFTSpectrogram(f_sample=50_000.0, output_size=(128, 128), log_scale=True)
+    return stft.compute_batch(X)   # (N, C, 128, 128)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Training / evaluation helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -111,6 +134,12 @@ def train_and_evaluate(
     n_channels = X.shape[1]
     n_classes = len(np.unique(y))
     window_size = X.shape[-1]
+
+    # ── spectrogram_cnn needs (N, C, H, W) STFT input, not raw waveforms ──
+    if model_name == "spectrogram_cnn":
+        logger.info("    Applying STFT transform for spectrogram_cnn ...")
+        X = apply_stft_transform(X)   # (N, C, 128, 128)
+        logger.info("    Spectrogram shape: %s", X.shape)
 
     X_train, X_tmp, y_train, y_tmp = train_test_split(
         X, y, test_size=0.30, stratify=y, random_state=random_seed
