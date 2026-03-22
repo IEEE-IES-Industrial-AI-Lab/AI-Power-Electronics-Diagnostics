@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "AI Power Electronics Diagnostics"
+message: "Fault detection benchmarks for inverters and motor drives — IEEE IES JESTPE/TIE track"
+type: software
+authors:
+  - family-names: "El-Qersh"
+    given-names: "Assem"
+    email: "assemsaid35@gmail.com"
+repository-code: "https://github.com/IEEE-IES-Industrial-AI-Lab/AI-Power-Electronics-Diagnostics"
+keywords:
+  - power electronics
+  - fault detection
+  - inverter diagnostics
+  - IGBT fault
+  - IEEE IES
+license: MIT
