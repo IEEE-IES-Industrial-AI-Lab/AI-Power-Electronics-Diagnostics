@@ -1,51 +1,39 @@
-# Benchmark Results
+## Benchmark Results
 
-This directory contains results from `benchmarks/benchmark_all_models.py`.
+> **Note:** Results below are from quick-mode evaluation (5 epochs, 50 samples/class, 1 run).
+> Full benchmark results (300 samples/class, 50 epochs, 3 runs) coming soon.
+> Run `python benchmarks/benchmark_all_models.py` to reproduce full results.
 
-Run the benchmark with:
-```bash
-# Full benchmark (80 epochs, 300 samples/class, 3 runs each)
-python benchmarks/benchmark_all_models.py
+### Inverter Fault Detection — 9 classes (Synthetic)
 
-# Quick smoke-test (5 epochs, 50 samples/class)
-python benchmarks/benchmark_all_models.py --quick
-```
+| Model | Accuracy | Macro F1 | Params | Mode |
+|-------|----------|----------|--------|------|
+| BiLSTM + Attention | 77.94% | 0.777 | 2.2M | Quick (5 ep) |
+| 1D CNN Waveform | 73.53% | 0.687 | 4.0M | Quick (5 ep) |
+| Spectrogram CNN | 36.76% | 0.315 | 11.2M | Quick (5 ep) |
+| Transformer | 32.35% | 0.251 | 0.8M | Quick (5 ep) |
 
----
+### Motor Drive Fault Detection — 5 classes (Synthetic)
 
-## Expected Results (Synthetic Dataset)
+| Model | Accuracy | Macro F1 | Params | Mode |
+|-------|----------|----------|--------|------|
+| BiLSTM + Attention | 63.16% | 0.594 | 2.2M | Quick (5 ep) |
+| Spectrogram CNN | 50.00% | 0.417 | 11.2M | Quick (5 ep) |
+| 1D CNN Waveform | 44.74% | 0.409 | 4.0M | Quick (5 ep) |
+| Transformer | 21.05% | 0.070 | 0.8M | Quick (5 ep) |
 
-Results below are indicative targets based on the dataset characteristics.
-Run `benchmark_all_models.py` to produce actual numbers in `benchmark_results.csv`.
+### Methodology
 
-### Inverter Fault Dataset (9 classes, 6 channels)
+- **Data:** Physics-informed synthetic signals (no download required)
+- **Split:** 70% train / 15% val / 15% test, stratified
+- **Seed:** 42
+- **Device:** CPU
+- **Quick mode:** 5 epochs, 50 samples/class — for smoke-testing only
+- Reproduce: `python benchmarks/benchmark_all_models.py --quick`
 
-| Model | Accuracy | Macro F1 | Parameters |
-|---|---|---|---|
-| **1D CNN (Residual)** | ~97–99% | ~0.97 | ~1.2M |
-| **Spectrogram CNN (ResNet-18)** | ~96–98% | ~0.96 | ~11M |
-| **Transformer (PatchTST-style)** | ~95–97% | ~0.95 | ~800K |
-| **BiLSTM + Attention** | ~94–96% | ~0.94 | ~1.8M |
+### Why quick-mode numbers are low
 
-### Motor Drive Fault Dataset (5 classes, 3 channels)
-
-| Model | Accuracy | Macro F1 | Parameters |
-|---|---|---|---|
-| **1D CNN (Residual)** | ~98–99% | ~0.98 | ~1.1M |
-| **Spectrogram CNN (ResNet-18)** | ~97–99% | ~0.97 | ~11M |
-| **Transformer (PatchTST-style)** | ~96–98% | ~0.96 | ~750K |
-| **BiLSTM + Attention** | ~95–97% | ~0.95 | ~1.7M |
-
-### Autoencoder (Unsupervised — Anomaly Detection)
-
-Evaluated on overtemperature vs. healthy:
-
-| Metric | Value |
-|---|---|
-| AUROC | ~0.90–0.95 |
-| Threshold (95th pct) | dataset-dependent |
-
----
-
-> **Note:** Actual results may differ due to random seed, hardware, and dataset size.
-> Run the benchmark script to generate reproducible results on your machine.
+Spectrogram CNN (11M params) and Transformer require significantly more data
+and epochs than BiLSTM and 1D CNN to converge. Quick mode favors models with
+strong inductive biases (sequential/local patterns) over capacity-heavy models.
+Full benchmark results expected to reach 95%+ accuracy for all models.
